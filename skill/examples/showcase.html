@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ja" data-accent="koke">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>日々の記録 見本</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/components.css">
+<style>
+/* 見本画面の骨組み。デスクトップはサイドバー + 本文、モバイルは下のタブバー */
+.app { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100dvh; }
+.side {
+  background: var(--bg-subtle); border-right: 1px solid var(--border-subtle);
+  padding: var(--space-5) var(--space-3); display: grid; align-content: start; gap: var(--space-6);
+  position: sticky; top: 0; height: 100dvh;
+}
+.brand { display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-3); font-weight: var(--weight-bold); }
+.brand-mark { width: 22px; height: 22px; border-radius: var(--radius-sm); background: var(--accent-solid); display: grid; place-items: center; color: var(--on-accent); }
+.brand-mark svg { width: 14px; height: 14px; }
+.nav .td-row { border-bottom: 0; border-radius: var(--radius-md); min-height: 40px; gap: var(--space-3); font-size: var(--text-sm); }
+.nav .td-row svg { width: 18px; height: 18px; color: var(--text-secondary); }
+.nav .td-row[aria-current="page"] { font-weight: var(--weight-bold); }
+.nav .td-row[aria-current="page"] svg { color: var(--accent-text); }
+
+.main {
+  padding-block: var(--space-6) var(--space-16);
+  padding-left: max(var(--space-6), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--space-6), env(safe-area-inset-right, 0px));
+  display: grid; gap: var(--space-6); align-content: start; max-width: 1200px; width: 100%;
+}
+.topbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-4); }
+.topbar-title { display: grid; gap: var(--space-1); }
+.topbar-title p { color: var(--text-secondary); font-size: var(--text-sm); }
+.controls { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-4); align-items: center; }
+.control { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-secondary); }
+
+.cols { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: var(--space-6); align-items: start; }
+.col { display: grid; gap: var(--space-6); min-width: 0; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.card-head h2 { font-size: var(--text-lg); }
+.add-form { display: flex; gap: var(--space-2); }
+.add-form .td-input { flex: 1; min-width: 0; }
+.task-list .td-row { padding-inline: 0; }
+.task-list .td-check { flex: 1; min-width: 0; }
+.task-list .td-btn[data-icon-only] { color: var(--text-secondary); }
+.form-grid { display: grid; grid-template-columns: minmax(0, 1fr) 140px; gap: var(--gap-stack); }
+.form-grid .span-2 { grid-column: 1 / -1; }
+.form-actions { display: flex; justify-content: flex-end; gap: var(--space-2); }
+
+.meter-row { display: grid; gap: var(--space-2); }
+.meter-label { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--text-sm); }
+.meter-label b { font-size: var(--text-xl); font-weight: var(--weight-bold); }
+.meter { height: 6px; border-radius: var(--radius-full); background: var(--bg-subtle); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--accent-solid); border-radius: inherit; transition: width var(--dur-base) var(--ease-standard); }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-1); }
+.day { display: grid; gap: var(--space-1); justify-items: center; font-size: var(--text-xs); color: var(--text-secondary); }
+.day span { width: 100%; aspect-ratio: 1; max-width: 32px; border-radius: var(--radius-sm); background: var(--bg-subtle); }
+.day[data-done] span { background: var(--accent-solid); }
+.day[data-part] span { background: var(--accent-tint); }
+.day[data-today] { color: var(--text-primary); font-weight: var(--weight-bold); }
+
+.stack { display: grid; gap: var(--space-3); }
+.badges { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.loading-demo { display: grid; gap: var(--space-2); }
+.loading-line { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary); }
+.danger-zone { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.danger-zone p { font-size: var(--text-sm); color: var(--text-secondary); }
+
+.tabbar { display: none; }
+
+@media (max-width: 960px) {
+  .cols { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 719px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { display: none; }
+  .main {
+    padding-left: max(var(--space-4), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, 0px));
+    padding-bottom: calc(56px + var(--space-10) + env(safe-area-inset-bottom, 0px));
+  }
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .tabbar {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+    background: var(--bg-surface); border-top: 1px solid var(--border-subtle);
+  }
+  .tabbar a {
+    display: grid; justify-items: center; align-content: center; gap: 2px; height: 56px;
+    font-size: var(--text-xs); color: var(--text-secondary); text-decoration: none;
+  }
+  .tabbar a svg { width: 22px; height: 22px; }
+  .tabbar a[aria-current="page"] { color: var(--accent-text); font-weight: var(--weight-bold); }
+  .td-toast-region { bottom: calc(56px + var(--space-3) + env(safe-area-inset-bottom, 0px)); }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="i-sun" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"/></g>
+    <g id="i-book" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 1 5 16V4.5Z"/><path d="M5 16a3.5 3.5 0 0 1 3.5-3.5H19"/></g>
+    <g id="i-chart" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/></g>
+    <g id="i-gear" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M6 18l1.4-1.4M16.6 7.4 18 6"/></g>
+    <g id="i-plus" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></g>
+    <g id="i-trash" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 12.5h9l1-12.5"/></g>
+    <g id="i-ok" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></g>
+    <g id="i-warn" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 19.5h18.4L12 4Z"/><path d="M12 10v4.5"/><path d="M12 17.5h.01"/></g>
+    <g id="i-err" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></g>
+    <g id="i-box" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 2.5h5L16 13h5"/><path d="M5.5 5h13L21 13v6H3v-6L5.5 5Z"/></g>
+    <g id="i-leaf" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z"/><path d="M5 19l7-7"/></g>
+  </defs>
+</svg>
+
+<div class="app">
+  <aside class="side" aria-label="メニュー">
+    <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24"><use href="#i-leaf"/></svg></span>日々の記録</div>
+    <ul class="td-list nav">
+      <li><a class="td-row" href="#today" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg>今日</a></li>
+      <li><a class="td-row" href="#log"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg>記録</a></li>
+      <li><a class="td-row" href="#week-card"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>集計</a></li>
+      <li><a class="td-row" href="#settings"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gear"/></svg>設定</a></li>
+    </ul>
+  </aside>
+
+  <main class="main" id="today">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>今日</h1>
+        <p><time datetime="2026-11-21">11 月 21 日(金)</time> ・ 3 件のうち 1 件完了</p>
+      </div>
+      <div class="controls" aria-label="見本の表示設定">
+        <div class="control"><span>色</span>
+          <div class="td-segmented" role="group" aria-label="アクセント色" data-set="accent">
+            <button type="button" data-value="koke" aria-pressed="true">苔</button>
+            <button type="button" data-value="kohaku" aria-pressed="false">琥珀</button>
+          </div>
+        </div>
+        <div class="control"><span>表示</span>
+          <div class="td-segmented" role="group" aria-label="ライトとダーク" data-set="theme">
+            <button type="button" data-value="" aria-pressed="true">端末</button>
+            <button type="button" data-value="light" aria-pressed="false">ライト</button>
+            <button type="button" data-value="dark" aria-pressed="false">ダーク</button>
+          </div>
+        </div>
+        <div class="control"><span>密度</span>
+          <div class="td-segmented" role="group" aria-label="情報の密度" data-set="density">
+            <button type="button" data-value="compact" aria-pressed="false">詰める</button>
+            <button type="button" data-value="" aria-pressed="true">中間</button>
+            <button type="button" data-value="spacious" aria-pressed="false">広げる</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="cols">
+      <div class="col">
+        <section class="td-card" aria-labelledby="tasks-h">
+          <div class="card-head">
+            <h2 id="tasks-h">やること</h2>
+            <span class="td-badge" data-tone="accent" id="task-count">残り 2 件</span>
+          </div>
+          <form class="add-form" id="add-form">
+            <label class="visually-hidden" for="new-task">やることを追加</label>
+            <input class="td-input" id="new-task" name="task" placeholder="やることを追加" autocomplete="off">
+            <button class="td-btn" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>追加</button>
+          </form>
+          <ul class="td-list task-list" id="tasks"></ul>
+        </section>
+
+        <section class="td-card" aria-labelledby="log-h" id="log">
+          <div class="card-head"><h2 id="log-h">記録を書く</h2></div>
+          <form id="log-form" novalidate>
+            <div class="form-grid">
+              <div class="td-field">
+                <label class="td-label" for="log-title">やったこと</label>
+                <input class="td-input" id="log-title" name="title" autocomplete="off" aria-describedby="log-title-msg">
+                <p class="td-help" id="log-title-msg">例: 英単語、ランニング、読書</p>
+              </div>
+              <div class="td-field">
+                <label class="td-label" for="log-min">時間(分)</label>
+                <input class="td-input num" id="log-min" name="minutes" type="number" inputmode="numeric" min="1" max="1440" value="30">
+              </div>
+              <div class="td-field span-2">
+                <label class="td-label" for="log-note">メモ<span class="td-optional">任意</span></label>
+                <textarea class="td-input" id="log-note" name="note"></textarea>
+              </div>
+              <label class="td-check span-2"><input class="td-switch" type="checkbox" role="switch" id="log-share" checked><span>週のふりかえりに含める</span></label>
+            </div>
+            <div class="form-actions">
+              <button class="td-btn" type="reset">クリア</button>
+              <button class="td-btn" data-variant="primary" type="submit" id="log-submit">記録する</button>
+            </div>
+          </form>
+          <div class="td-table-wrap">
+            <table class="td-table">
+              <thead><tr><th scope="col">日付</th><th scope="col">やったこと</th><th scope="col" data-align="end">時間</th></tr></thead>
+              <tbody id="log-rows">
+                <tr><td>11/21</td><td>英単語</td><td data-align="end">25 分</td></tr>
+                <tr><td>11/20</td><td>ランニング</td><td data-align="end">40 分</td></tr>
+                <tr><td>11/19</td><td>読書</td><td data-align="end">1 時間 10 分</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="td-card" aria-labelledby="week-h" id="week-card">
+          <div class="card-head">
+            <h2 id="week-h">今週</h2>
+            <div class="td-segmented" role="group" aria-label="期間" data-local>
+              <button type="button" aria-pressed="true">週</button>
+              <button type="button" aria-pressed="false">月</button>
+            </div>
+          </div>
+          <div class="meter-row">
+            <div class="meter-label"><span>記録した日</span><span><b class="num">4</b> / 7 日</span></div>
+            <div class="meter" role="img" aria-label="7 日のうち 4 日"><i style="width: 57%"></i></div>
+          </div>
+          <div class="week" aria-label="曜日ごとの記録">
+            <div class="day" data-done><span></span>月</div>
+            <div class="day" data-done><span></span>火</div>
+            <div class="day" data-part><span></span>水</div>
+            <div class="day" data-done><span></span>木</div>
+            <div class="day" data-done data-today><span></span>金</div>
+            <div class="day"><span></span>土</div>
+            <div class="day"><span></span>日</div>
+          </div>
+        </section>
+
+        <section class="td-card" aria-labelledby="state-h">
+          <div class="card-head"><h2 id="state-h">状態の表示</h2></div>
+          <div class="badges">
+            <span class="td-badge" data-tone="success"><svg viewBox="0 0 24 24"><use href="#i-ok"/></svg>同期済み</span>
+            <span class="td-badge" data-tone="warning"><svg viewBox="0 0 24 24"><use href="#i-warn"/></svg>未保存</span>
+            <span class="td-badge" data-tone="error"><svg viewBox="0 0 24 24"><use href="#i-err"/></svg>同期できません</span>
+            <span class="td-badge" data-tone="accent">進行中</span>
+            <span class="td-badge">下書き</span>
+          </div>
+          <div class="stack">
+            <div class="td-notice" data-tone="success" role="status">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ok"/></svg>
+              <div><p class="td-notice-title">5 日続いています</p><p>先週の最長記録まであと 1 日です。</p></div>
+            </div>
+            <div class="td-notice" data-tone="warning" role="status">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-warn"/></svg>
+              <div><p class="td-notice-title">保存されていない変更があります</p><p>画面を閉じる前に「記録する」を押してください。</p></div>
+            </div>
+            <div class="td-notice" data-tone="error" role="status">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-err"/></svg>
+              <div><p class="td-notice-title">同期できませんでした</p><p>通信が切れています。つながると自動で再開します。</p></div>
+            </div>
+          </div>
+          <div class="loading-demo" aria-label="読み込み中の表示">
+            <div class="loading-line"><span class="td-spinner" role="status" aria-label="読み込み中"></span>集計を読み込んでいます</div>
+            <span class="td-skeleton" style="height: 14px; width: 80%"></span>
+            <span class="td-skeleton" style="height: 14px; width: 55%"></span>
+          </div>
+        </section>
+
+        <section class="td-card" aria-labelledby="memo-h">
+          <div class="card-head"><h2 id="memo-h">メモ</h2></div>
+          <div class="td-empty">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-box"/></svg>
+            <p class="td-empty-title">まだメモがありません</p>
+            <p>気づいたことを 1 行書いておくと、週のふりかえりで読み返せます。</p>
+            <button class="td-btn" type="button" id="memo-btn">最初のメモを書く</button>
+          </div>
+        </section>
+
+        <section class="td-card" aria-labelledby="settings-h" id="settings">
+          <div class="card-head"><h2 id="settings-h">アカウント</h2></div>
+          <div class="danger-zone">
+            <p>記録をすべて消して、最初からやり直します。</p>
+            <button class="td-btn" data-variant="danger" type="button" id="reset-btn">すべての記録を削除する</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="メニュー">
+    <a href="#today" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg>今日</a>
+    <a href="#log"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book"/></svg>記録</a>
+    <a href="#week-card"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>集計</a>
+    <a href="#settings"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gear"/></svg>設定</a>
+  </nav>
+</div>
+
+<dialog class="td-dialog" id="reset-dialog" aria-labelledby="reset-title">
+  <h2 id="reset-title">すべての記録を削除しますか?</h2>
+  <p class="td-dialog-body">記録 128 件とメモがすべて消えます。この操作は元に戻せません。</p>
+  <form method="dialog" class="td-dialog-actions">
+    <button class="td-btn" value="cancel">キャンセル</button>
+    <button class="td-btn" data-variant="danger" value="delete">削除する</button>
+  </form>
+</dialog>
+
+<div class="td-toast-region" aria-live="polite"></div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+
+  // ---------- 表示設定(見本専用) ----------
+  function store(k, v) { try { v ? localStorage.setItem('td-' + k, v) : localStorage.removeItem('td-' + k); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem('td-' + k); } catch (e) { return null; } }
+  var ATTR = { accent: 'data-accent', theme: 'data-theme', density: 'data-density' };
+  function apply(set, value) {
+    if (value) root.setAttribute(ATTR[set], value); else root.removeAttribute(ATTR[set]);
+    if (set === 'accent' && !value) root.setAttribute('data-accent', 'koke');
+    document.querySelectorAll('[data-set="' + set + '"] button').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.value === (value || (set === 'accent' ? 'koke' : ''))));
+    });
+    store(set, value);
+  }
+  document.querySelectorAll('[data-set]').forEach(function (g) {
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (b) apply(g.dataset.set, b.dataset.value);
+    });
+  });
+  ['accent', 'theme', 'density'].forEach(function (k) { var v = load(k); if (v) apply(k, v); });
+  document.querySelectorAll('[data-local]').forEach(function (g) {
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      g.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    });
+  });
+
+  // ---------- トースト ----------
+  function toast(message, opt) {
+    opt = opt || {};
+    var region = document.querySelector('.td-toast-region');
+    var el = document.createElement('div');
+    el.className = 'td-toast';
+    var span = document.createElement('span'); span.textContent = message; el.append(span);
+    function close() {
+      el.dataset.leaving = '';
+      el.addEventListener('animationend', function () { el.remove(); }, { once: true });
+    }
+    if (opt.actionLabel) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = opt.actionLabel;
+      b.addEventListener('click', function () { if (opt.onAction) opt.onAction(); close(); });
+      el.append(b);
+    } else {
+      var t = setTimeout(close, 4000);
+      el.addEventListener('pointerenter', function () { clearTimeout(t); });
+      el.addEventListener('pointerleave', function () { t = setTimeout(close, 2000); });
+    }
+    region.replaceChildren(el);
+  }
+
+  // ---------- やること ----------
+  var tasks = [
+    { text: 'レポートの下書きを出す', done: true, meta: '9:40 に完了' },
+    { text: '出席データを確認する', done: false, meta: '15:00 まで' },
+    { text: '買い物リストを作る', done: false, meta: '' }
+  ];
+  var list = document.getElementById('tasks');
+  var count = document.getElementById('task-count');
+  var uid = 0;
+  function rowFor(t, isNew) {
+    var li = document.createElement('li');
+    li.className = 'td-row';
+    if (isNew) li.setAttribute('data-new', '');
+    var id = 'task-' + (++uid);
+    li.innerHTML =
+      '<label class="td-check" for="' + id + '"><input type="checkbox" id="' + id + '"><span class="td-check-text" data-strike></span></label>' +
+      '<span class="td-row-end"><span class="td-row-meta"></span>' +
+      '<button class="td-btn" data-variant="ghost" data-icon-only type="button" aria-label="削除"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-trash"/></svg></button></span>';
+    li.querySelector('.td-check-text').textContent = t.text;
+    li.querySelector('.td-row-meta').textContent = t.meta || '';
+    var cb = li.querySelector('input');
+    cb.checked = t.done;
+    cb.addEventListener('change', function () { t.done = cb.checked; updateCount(); });
+    li.querySelector('button').addEventListener('click', function () {
+      var next = li.nextSibling;
+      var idx = tasks.indexOf(t);
+      tasks.splice(idx, 1); li.remove(); updateCount();
+      toast('「' + t.text + '」を削除しました', {
+        actionLabel: '元に戻す',
+        onAction: function () { tasks.splice(idx, 0, t); list.insertBefore(li, next); updateCount(); }
+      });
+    });
+    return li;
+  }
+  function updateCount() {
+    var left = tasks.filter(function (t) { return !t.done; }).length;
+    count.textContent = left ? '残り ' + left + ' 件' : 'すべて完了';
+  }
+  tasks.forEach(function (t) { list.append(rowFor(t, false)); });
+  updateCount();
+  document.getElementById('add-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var input = document.getElementById('new-task');
+    var text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    var t = { text: text, done: false, meta: '' };
+    tasks.push(t); list.append(rowFor(t, true)); updateCount();
+    input.value = '';
+  });
+
+  // ---------- 記録のフォーム ----------
+  var form = document.getElementById('log-form');
+  var title = document.getElementById('log-title');
+  var minutes = document.getElementById('log-min');
+  var msg = document.getElementById('log-title-msg');
+  var helpText = msg.textContent;
+  function setError(input, el, text) {
+    if (text) {
+      input.setAttribute('aria-invalid', 'true');
+      el.className = 'td-error';
+      el.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-err"/></svg><span></span>';
+      el.querySelector('span').textContent = text;
+    } else {
+      input.removeAttribute('aria-invalid');
+      el.className = 'td-help';
+      el.textContent = helpText;
+    }
+  }
+  // 一度エラーを出した欄は、入力中に直った時点でエラーを消す
+  title.addEventListener('input', function () {
+    if (title.getAttribute('aria-invalid') && title.value.trim()) setError(title, msg, '');
+  });
+  title.addEventListener('blur', function () {
+    if (title.getAttribute('aria-invalid') && !title.value.trim()) setError(title, msg, 'やったことを入力してください。');
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!title.value.trim()) {
+      setError(title, msg, 'やったことを入力してください。');
+      title.focus();
+      return;
+    }
+    var btn = document.getElementById('log-submit');
+    btn.setAttribute('aria-busy', 'true');
+    setTimeout(function () {
+      btn.removeAttribute('aria-busy');
+      var m = Math.max(1, parseInt(minutes.value, 10) || 0);
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>11/21</td><td></td><td data-align="end"></td>';
+      tr.children[1].textContent = title.value.trim();
+      tr.children[2].textContent = m >= 60 ? Math.floor(m / 60) + ' 時間' + (m % 60 ? ' ' + (m % 60) + ' 分' : '') : m + ' 分';
+      document.getElementById('log-rows').prepend(tr);
+      toast('「' + title.value.trim() + '」を記録しました');
+      form.reset();
+    }, 700);
+  });
+  form.addEventListener('reset', function () { setError(title, msg, ''); });
+
+  // ---------- 空状態とダイアログ ----------
+  document.getElementById('memo-btn').addEventListener('click', function () {
+    document.getElementById('log-note').focus();
+  });
+  var dlg = document.getElementById('reset-dialog');
+  document.getElementById('reset-btn').addEventListener('click', function () { dlg.showModal(); });
+  dlg.addEventListener('close', function () {
+    if (dlg.returnValue === 'delete') toast('見本なので、記録は削除していません');
+    dlg.returnValue = '';
+  });
+})();
+</script>
+</body>
+</html>
