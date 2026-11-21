@@ -1,0 +1,439 @@
+<title>デザイン候補の見本帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Shippori+Mincho+B1:wght@600;700&display=swap">
+<style>
+/* 構成: 縦に 3 つの比較(配色 → 動き → 書体)。見本の中だけ候補の色を使い、ページ自体は中立の暖かいグレーに留める */
+:root {
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --ink: #27241F;
+  --muted: #6A645C;
+  --line: #E3DFD8;
+  --focus: #2F4C7E;
+  /* 下の見本で使う候補色(JS が選択に応じて上書きする) */
+  --cal: #B4462B; --cal-on: #FFFFFF;
+  --cad: #E2775A; --cad-on: #1B1917;
+  --accent: var(--cal); --on-accent: var(--cal-on);
+  --font-body: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif;
+  --font-maru: "Zen Maru Gothic", var(--font-body);
+  --font-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #181715; --surface: #211F1C; --ink: #ECE8E2; --muted: #A59E95; --line: #36322D; --focus: #93ACD9;
+    --accent: var(--cad); --on-accent: var(--cad-on);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #181715; --surface: #211F1C; --ink: #ECE8E2; --muted: #A59E95; --line: #36322D; --focus: #93ACD9;
+  --accent: var(--cad); --on-accent: var(--cad-on);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 56px; }
+h1 { font-size: 26px; line-height: 1.35; margin: 0; text-wrap: balance; }
+h2 { font-size: 19px; margin: 0; text-wrap: balance; }
+.lead { color: var(--muted); max-width: 62ch; margin: 0; }
+header { display: grid; gap: 10px; }
+section { display: grid; gap: 18px; }
+.sec-head { display: grid; gap: 4px; }
+.sec-head p { margin: 0; color: var(--muted); max-width: 62ch; }
+.tag { font-size: 12px; letter-spacing: .06em; color: var(--muted); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- 1. 配色候補 ---------- */
+.cands { display: grid; gap: 28px; }
+.cand { display: grid; gap: 12px; }
+.cand-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.cand-head h3 { margin: 0; font-size: 17px; }
+.cand-head .sub { color: var(--muted); font-size: 13px; }
+.cand-note { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 70ch; }
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+
+.pv {
+  background: var(--p-bg); color: var(--p-ink);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px; display: grid; gap: 12px; min-width: 0;
+}
+.pv-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--p-muted); }
+.ratio { font-variant-numeric: tabular-nums; }
+.ratio b { font-weight: 600; }
+.app { background: var(--p-surface); border: 1px solid var(--p-line); border-radius: var(--radius); padding: 14px; display: grid; gap: 12px; }
+.app-title { font-weight: 600; font-size: 14px; }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 6px; font-size: 14px; }
+.item.sel { background: color-mix(in oklab, var(--p-accent) 13%, var(--p-surface)); }
+.item.done .t { color: var(--p-muted); text-decoration: line-through; }
+.cb { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--p-muted); flex: none; display: grid; place-items: center; }
+.cb.on { background: var(--p-accent); border-color: var(--p-accent); }
+.cb.on::after { content: ""; width: 8px; height: 4px; border: 2px solid var(--p-on); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
+.chip { margin-left: auto; font-size: 11.5px; padding: 1px 8px; border-radius: 999px; color: var(--p-accent); border: 1px solid color-mix(in oklab, var(--p-accent) 45%, transparent); }
+.field { display: grid; gap: 4px; font-size: 12px; color: var(--p-muted); }
+.field input {
+  font: inherit; font-size: 14px; color: var(--p-ink); background: var(--p-bg);
+  border: 1px solid var(--p-line); border-radius: 6px; padding: 7px 10px; width: 100%;
+}
+.field input:focus { outline: none; border-color: var(--p-accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--p-accent) 22%, transparent); }
+.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn { font: inherit; font-size: 13.5px; font-weight: 600; border-radius: 6px; padding: 7px 14px; cursor: pointer; border: 1px solid transparent; }
+.btn.primary { background: var(--p-accent); color: var(--p-on); }
+.btn.ghost { background: transparent; color: var(--p-ink); border-color: var(--p-line); }
+.sw { margin-left: auto; width: 34px; height: 20px; border-radius: 999px; background: var(--p-accent); position: relative; flex: none; }
+.sw::after { content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: var(--p-on); top: 2px; right: 2px; }
+.link { color: var(--p-accent); font-size: 13.5px; text-decoration: underline; text-underline-offset: 3px; }
+.status { display: flex; flex-wrap: wrap; gap: 6px; }
+.st { font-size: 12px; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 5px; }
+.st::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.st.ok { color: var(--p-ok); background: color-mix(in oklab, var(--p-ok) 12%, var(--p-surface)); }
+.st.warn { color: var(--p-warn); background: color-mix(in oklab, var(--p-warn) 12%, var(--p-surface)); }
+.st.err { color: var(--p-err); background: color-mix(in oklab, var(--p-err) 12%, var(--p-surface)); }
+.st.acc { color: var(--p-accent); background: color-mix(in oklab, var(--p-accent) 12%, var(--p-surface)); }
+.st.acc::before { border-radius: 1px; }
+
+/* ---------- 候補の切り替え ---------- */
+.picker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.picker .lbl { font-size: 13px; color: var(--muted); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button {
+  font: inherit; font-size: 13.5px; cursor: pointer; padding: 5px 12px; border-radius: 999px;
+  background: transparent; color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 6px;
+}
+.seg button .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--d); }
+.seg button[aria-checked="true"] { border-color: var(--ink); font-weight: 600; }
+
+/* ---------- 2. 動き ---------- */
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.demo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0; position: relative; overflow: hidden; }
+.demo-head { display: grid; gap: 2px; }
+.demo-head h3 { margin: 0; font-size: 16px; }
+.demo-head p { margin: 0; font-size: 13px; color: var(--muted); }
+.mlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.mitem { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 6px; font-size: 14px; cursor: pointer; user-select: none; }
+.mitem:hover { background: color-mix(in oklab, var(--ink) 5%, transparent); }
+.mcb { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--muted); flex: none; display: grid; place-items: center; }
+.mcb::after { content: ""; width: 9px; height: 5px; border: 2px solid var(--on-accent); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); opacity: 0; }
+.mitem.done .mcb { background: var(--accent); border-color: var(--accent); }
+.mitem.done .mcb::after { opacity: 1; }
+.mt { position: relative; }
+.mt::after { content: ""; position: absolute; left: 0; top: 52%; height: 1.5px; background: currentColor; width: 100%; opacity: 0; }
+.mitem.done .mt { color: var(--muted); }
+.mitem.done .mt::after { opacity: 1; }
+.mrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mbtn { font: inherit; font-size: 13.5px; font-weight: 600; border-radius: 6px; padding: 7px 14px; cursor: pointer; border: 1px solid transparent; }
+.mbtn.primary { background: var(--accent); color: var(--on-accent); }
+.mbtn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.msw { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; background: none; border: 0; font-family: inherit; padding: 0; }
+.msw .track { width: 36px; height: 22px; border-radius: 999px; background: var(--line); position: relative; }
+.msw .knob { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF; top: 2px; left: 2px; box-shadow: 0 1px 2px rgb(0 0 0 / .25); }
+.msw[aria-checked="true"] .track { background: var(--accent); }
+.msw[aria-checked="true"] .knob { transform: translateX(14px); }
+.toast {
+  position: absolute; left: 16px; right: 16px; bottom: 14px;
+  background: var(--ink); color: var(--bg); font-size: 13px; border-radius: 8px; padding: 9px 12px;
+  opacity: 0; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+.spacer { height: 30px; }
+
+/* 控えめ: 短く、フェードと色の変化だけ */
+.calm { --dur: 140ms; --ease: cubic-bezier(.2, 0, 0, 1); }
+.calm .mcb, .calm .mcb::after, .calm .mt, .calm .mt::after, .calm .track, .calm .knob, .calm .mbtn { transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), opacity var(--dur) var(--ease), color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.calm .mbtn:active { filter: brightness(.92); }
+.calm .toast { transform: translateY(0); transition: opacity 160ms var(--ease); }
+.calm .mitem.new { animation: calm-in 180ms var(--ease) both; }
+@keyframes calm-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* 要所で心地よく: 少し長く、わずかに弾む */
+.lively { --dur: 260ms; --ease: cubic-bezier(.2, 0, 0, 1); --spring: cubic-bezier(.34, 1.56, .64, 1); }
+.lively .mcb { transition: background-color 160ms var(--ease), border-color 160ms var(--ease), transform 300ms var(--spring); }
+.lively .mitem.done .mcb { animation: pop 320ms var(--spring); }
+@keyframes pop { 0% { transform: scale(.7); } 100% { transform: scale(1); } }
+.lively .mcb::after { transition: opacity 120ms var(--ease) 60ms; }
+.lively .mt { transition: color var(--dur) var(--ease); }
+.lively .mt::after { opacity: 1; width: 0; transition: width var(--dur) var(--ease); }
+.lively .mitem.done .mt::after { width: 100%; }
+.lively .track { transition: background-color 200ms var(--ease); }
+.lively .knob { transition: transform 300ms var(--spring); }
+.lively .mbtn { transition: transform 120ms var(--ease), filter 120ms var(--ease); }
+.lively .mbtn:active { transform: scale(.96); }
+.lively .toast { transform: translateY(12px); transition: opacity 200ms var(--ease), transform 360ms var(--spring); }
+.lively .toast.show { transform: translateY(0); }
+.lively .mitem.new { animation: lively-in 380ms var(--spring) both; }
+@keyframes lively-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+
+.rm-note { display: none; font-size: 13px; color: var(--muted); margin: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .demo *, .demo *::after { transition: none !important; animation: none !important; }
+  .rm-note { display: block; }
+}
+
+/* ---------- 3. 書体 ---------- */
+.trio { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.fcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.fcard .tag { margin: 0; }
+.fcard h3 { margin: 0; font-size: 23px; line-height: 1.35; font-weight: 700; text-wrap: balance; }
+.fcard .sub2 { margin: 0; font-size: 13px; color: var(--muted); }
+.fcard p.body { margin: 0; font-size: 14.5px; }
+.fcard .num { display: flex; align-items: baseline; gap: 6px; }
+.fcard .num b { font-size: 28px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent); }
+.fcard .num span { font-size: 13px; color: var(--muted); }
+.fcard .meter { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.fcard .meter i { display: block; height: 100%; width: 80%; background: var(--accent); }
+.f-sys h3, .f-sys .num b { font-family: var(--font-body); }
+.f-maru h3, .f-maru .num b { font-family: var(--font-maru); font-weight: 700; }
+.f-min h3 { font-family: var(--font-mincho); font-weight: 700; letter-spacing: .02em; }
+.f-min .num b { font-family: var(--font-body); }
+.fnote { margin: 0; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+
+footer { border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); font-size: 14px; }
+footer p { margin: 0; max-width: 66ch; }
+footer code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; color: var(--ink); }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="tag">静か + 温かい ・ 決めること 3 点</span>
+    <h1>デザイン候補の見本帳</h1>
+    <p class="lead">配色 4 案をライトとダークで並べました。下の「動き」と「書体」の見本は、選んだ配色で表示されます。触って比べてから、気に入ったものを教えてください。</p>
+  </header>
+
+  <section aria-labelledby="s1">
+    <div class="sec-head">
+      <h2 id="s1">1. アクセント色</h2>
+      <p>地色はどの案もわずかに暖かいグレーです。各パネル右上の数値は文字と背景のコントラスト比で、4.5 以上なら WCAG AA を満たします。成功・注意・エラーの色と並べて、主役の色と紛れないかも見てください。</p>
+    </div>
+    <div class="cands" id="cands"></div>
+  </section>
+
+  <div class="picker">
+    <span class="lbl">下の見本に使う配色</span>
+    <div class="seg" role="radiogroup" aria-label="見本に使う配色" id="seg"></div>
+  </div>
+
+  <section aria-labelledby="s2">
+    <div class="sec-head">
+      <h2 id="s2">2. 動き</h2>
+      <p>同じ操作を 2 つの強さで並べました。項目をクリックして完了にする、スイッチを切り替える、追加・保存を押す、を両方で試してください。</p>
+      <p class="rm-note">この端末は「視差効果を減らす」が有効なので、動きを止めて表示しています。設定を外すと比較できます。</p>
+    </div>
+    <div class="duo">
+      <div class="demo calm" data-demo>
+        <div class="demo-head"><h3>控えめ</h3><p>0.14 秒前後。色とフェードだけで変化を伝える</p></div>
+        <ul class="mlist">
+          <li class="mitem" role="checkbox" aria-checked="false" tabindex="0"><span class="mcb"></span><span class="mt">レポートの下書き</span></li>
+          <li class="mitem" role="checkbox" aria-checked="false" tabindex="0"><span class="mcb"></span><span class="mt">出席データの確認</span></li>
+          <li class="mitem" role="checkbox" aria-checked="false" tabindex="0"><span class="mcb"></span><span class="mt">買い物リスト</span></li>
+        </ul>
+        <div class="mrow">
+          <button class="mbtn primary" data-save type="button">保存する</button>
+          <button class="mbtn ghost" data-add type="button">項目を追加</button>
+          <button class="msw" role="switch" aria-checked="true" type="button"><span>通知</span><span class="track"><span class="knob"></span></span></button>
+        </div>
+        <div class="spacer"></div>
+        <div class="toast" role="status">保存しました</div>
+      </div>
+      <div class="demo lively" data-demo>
+        <div class="demo-head"><h3>要所で心地よく</h3><p>0.26〜0.36 秒。完了や切り替えで少しだけ弾む</p></div>
+        <ul class="mlist">
+          <li class="mitem" role="checkbox" aria-checked="false" tabindex="0"><span class="mcb"></span><span class="mt">レポートの下書き</span></li>
+          <li class="mitem" role="checkbox" aria-checked="false" tabindex="0"><span class="mcb"></span><span class="mt">出席データの確認</span></li>
+          <li class="mitem" role="checkbox" aria-checked="false" tabindex="0"><span class="mcb"></span><span class="mt">買い物リスト</span></li>
+        </ul>
+        <div class="mrow">
+          <button class="mbtn primary" data-save type="button">保存する</button>
+          <button class="mbtn ghost" data-add type="button">項目を追加</button>
+          <button class="msw" role="switch" aria-checked="true" type="button"><span>通知</span><span class="track"><span class="knob"></span></span></button>
+        </div>
+        <div class="spacer"></div>
+        <div class="toast" role="status">保存しました</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="s3">
+    <div class="sec-head">
+      <h2 id="s3">3. 書体</h2>
+      <p>本文はどれも端末の標準書体です(Mac はヒラギノ、Windows は游ゴシック、Android は Noto Sans)。違うのは見出しと大きな数字だけです。</p>
+    </div>
+    <div class="trio">
+      <article class="fcard f-sys">
+        <p class="tag">A ・ すべて標準書体</p>
+        <h3>今週のふりかえり</h3>
+        <p class="sub2">11 月 17 日〜23 日</p>
+        <div class="num"><b>12</b><span>/ 15 件 完了</span></div>
+        <div class="meter"><i></i></div>
+        <p class="body">先週より 3 件多く終わりました。残りの 3 件は、来週の月曜に回します。</p>
+        <p class="fnote">最も軽く、どの端末でもすぐ表示される。個性は配色と余白で出す。</p>
+      </article>
+      <article class="fcard f-maru">
+        <p class="tag">B ・ 見出し Zen Maru Gothic</p>
+        <h3>今週のふりかえり</h3>
+        <p class="sub2">11 月 17 日〜23 日</p>
+        <div class="num"><b>12</b><span>/ 15 件 完了</span></div>
+        <div class="meter"><i></i></div>
+        <p class="body">先週より 3 件多く終わりました。残りの 3 件は、来週の月曜に回します。</p>
+        <p class="fnote">丸ゴシック。温かさが増す。業務画面では少し柔らかすぎる場合がある。</p>
+      </article>
+      <article class="fcard f-min">
+        <p class="tag">C ・ 見出し Shippori Mincho B1</p>
+        <h3>今週のふりかえり</h3>
+        <p class="sub2">11 月 17 日〜23 日</p>
+        <div class="num"><b>12</b><span>/ 15 件 完了</span></div>
+        <div class="meter"><i></i></div>
+        <p class="body">先週より 3 件多く終わりました。残りの 3 件は、来週の月曜に回します。</p>
+        <p class="fnote">明朝。静けさと品が出る。小さい文字には向かないので、大きな見出しに限る。</p>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <p>決めたら、チャットで <code>苔・控えめ・B</code> のように伝えてください。「苔の色で藍の落ち着き」のような混ぜた希望でもかまいません。</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // 状態の色はどの案でも共通。主役の色と紛れないかを見るために並べる
+  var SEM = {
+    light: { ok: '#2E7D4F', warn: '#9A6200', err: '#B42318' },
+    dark:  { ok: '#6CC28E', warn: '#E3B04B', err: '#F08A7E' }
+  };
+  var C = [
+    { id: 'shu', name: '朱', sub: '朱肉や漆の朱をくすませた赤橙',
+      note: '温かさが最も強い。エラーの赤と近いので、採用するならエラー色を深紅寄りにずらし、アイコンでも区別する。地色をクリームにすると AI 生成 UI の定番の見た目に寄るため、地色はグレー寄りに保つ。',
+      light: { bg: '#FAF8F6', surface: '#FFFFFF', ink: '#2A2420', muted: '#6E645D', line: '#E6E0DA', accent: '#B4462B', on: '#FFFFFF' },
+      dark:  { bg: '#1B1917', surface: '#24211E', ink: '#EEE8E2', muted: '#A89E95', line: '#3A3531', accent: '#E2775A', on: '#1B1917' } },
+    { id: 'koke', name: '苔', sub: '苔や抹茶のような落ち着いた緑',
+      note: '静けさが最も強く、長時間見ても疲れにくい。成功の緑と近いので、採用するなら成功色を青緑へずらす。温かさは地色と書体で補う。',
+      light: { bg: '#F7F8F5', surface: '#FFFFFF', ink: '#232722', muted: '#626A5F', line: '#DFE3DA', accent: '#4F6B3A', on: '#FFFFFF' },
+      dark:  { bg: '#171A16', surface: '#1F231E', ink: '#E6EAE2', muted: '#9BA596', line: '#343A31', accent: '#9DB884', on: '#171A16' } },
+    { id: 'ai', name: '藍', sub: '藍染めの深い青を、暖かい地色に載せる',
+      note: '信頼感があり、情報量の多い画面でも落ち着く。状態の色とは紛れにくい。青そのものは冷たいので、地色を暖かくして和紙に藍のような組み合わせにしている。ありふれた青に見えないよう彩度を抑えている。',
+      light: { bg: '#F8F7F3', surface: '#FFFFFF', ink: '#24262B', muted: '#66655F', line: '#E3E0D8', accent: '#2F4C7E', on: '#FFFFFF' },
+      dark:  { bg: '#17181B', surface: '#1F2125', ink: '#E8E6E1', muted: '#A09E97', line: '#34353A', accent: '#93ACD9', on: '#17181B' } },
+    { id: 'kohaku', name: '琥珀', sub: '蜂蜜やべっ甲のような黄褐色',
+      note: '温かいが主張は穏やかで、紙と木の道具のような印象。注意の黄と近いので、採用するなら注意色を橙寄りにずらす。ライトでは白文字ボタンのコントラストが下限に近い。',
+      light: { bg: '#FAF8F4', surface: '#FFFFFF', ink: '#29251F', muted: '#6C655A', line: '#E5DFD5', accent: '#9A5B13', on: '#FFFFFF' },
+      dark:  { bg: '#1A1815', surface: '#23201C', ink: '#EDE8E0', muted: '#A69D90', line: '#3A352E', accent: '#E0A458', on: '#1A1815' } }
+  ];
+
+  function lum(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    var c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(function (v) {
+      v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  function ratio(a, b) {
+    var x = lum(a), y = lum(b);
+    return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+  }
+  function fmt(r) { return (Math.floor(r * 10) / 10).toFixed(1); }
+
+  function panel(c, t) {
+    var p = c[t], s = SEM[t];
+    var vars = '--p-bg:' + p.bg + ';--p-surface:' + p.surface + ';--p-ink:' + p.ink + ';--p-muted:' + p.muted +
+      ';--p-line:' + p.line + ';--p-accent:' + p.accent + ';--p-on:' + p.on +
+      ';--p-ok:' + s.ok + ';--p-warn:' + s.warn + ';--p-err:' + s.err;
+    var rLink = ratio(p.accent, p.surface), rBtn = ratio(p.on, p.accent);
+    var id = 'in-' + c.id + '-' + t;
+    return '<div class="pv" style="' + vars + '">' +
+      '<div class="pv-top"><span>' + (t === 'light' ? 'ライト' : 'ダーク') + '</span>' +
+      '<span class="ratio">リンク <b>' + fmt(rLink) + '</b> ・ ボタン <b>' + fmt(rBtn) + '</b></span></div>' +
+      '<div class="app">' +
+        '<div class="app-title">今日のやること</div>' +
+        '<ul class="list">' +
+          '<li class="item done"><span class="cb on"></span><span class="t">レポートの下書き</span></li>' +
+          '<li class="item sel"><span class="cb"></span><span class="t">出席データの確認</span><span class="chip">進行中</span></li>' +
+          '<li class="item"><span class="cb"></span><span class="t">買い物リスト</span></li>' +
+        '</ul>' +
+        '<label class="field" for="' + id + '"><span>メモ</span><input id="' + id + '" type="text" placeholder="ここをクリックすると枠の色を確認できます"></label>' +
+        '<div class="row"><button class="btn primary" type="button">保存する</button><button class="btn ghost" type="button">キャンセル</button><span class="sw" aria-hidden="true"></span></div>' +
+        '<a class="link" href="#s1">通知の詳しい設定</a>' +
+        '<div class="status"><span class="st acc">主役の色</span><span class="st ok">保存しました</span><span class="st warn">残り 2 件</span><span class="st err">通信できません</span></div>' +
+      '</div></div>';
+  }
+
+  var host = document.getElementById('cands');
+  host.innerHTML = C.map(function (c, i) {
+    return '<article class="cand"><div class="cand-head"><h3>' + String.fromCharCode(65 + i) + ' ・ ' + c.name + '</h3>' +
+      '<span class="sub">' + c.sub + '</span></div>' +
+      '<div class="panels">' + panel(c, 'light') + panel(c, 'dark') + '</div>' +
+      '<p class="cand-note">' + c.note + '</p></article>';
+  }).join('');
+
+  // 下の見本に使う配色の切り替え
+  var seg = document.getElementById('seg');
+  seg.innerHTML = C.map(function (c, i) {
+    return '<button type="button" role="radio" aria-checked="false" data-id="' + c.id + '" style="--d:' + c.light.accent + '">' +
+      '<span class="dot"></span>' + String.fromCharCode(65 + i) + ' ' + c.name + '</button>';
+  }).join('');
+  function pick(id) {
+    var c = C.filter(function (x) { return x.id === id; })[0] || C[0];
+    var r = document.documentElement.style;
+    r.setProperty('--cal', c.light.accent); r.setProperty('--cal-on', c.light.on);
+    r.setProperty('--cad', c.dark.accent); r.setProperty('--cad-on', c.dark.on);
+    seg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.id === c.id)); });
+    try { localStorage.setItem('cand', c.id); } catch (e) {}
+  }
+  seg.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (b) pick(b.dataset.id);
+  });
+  var saved = null;
+  try { saved = localStorage.getItem('cand'); } catch (e) {}
+  pick(saved || 'shu');
+
+  // 動きの見本
+  document.querySelectorAll('[data-demo]').forEach(function (demo) {
+    var list = demo.querySelector('.mlist');
+    var toast = demo.querySelector('.toast');
+    var count = 0, timer = null;
+    function toggle(li) {
+      var on = !li.classList.contains('done');
+      li.classList.toggle('done', on);
+      li.setAttribute('aria-checked', String(on));
+    }
+    list.addEventListener('click', function (e) {
+      var li = e.target.closest('.mitem'); if (li) toggle(li);
+    });
+    list.addEventListener('keydown', function (e) {
+      var li = e.target.closest('.mitem');
+      if (li && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); toggle(li); }
+    });
+    demo.querySelector('[data-add]').addEventListener('click', function () {
+      count += 1;
+      var li = document.createElement('li');
+      li.className = 'mitem new'; li.tabIndex = 0;
+      li.setAttribute('role', 'checkbox'); li.setAttribute('aria-checked', 'false');
+      li.innerHTML = '<span class="mcb"></span><span class="mt">新しい項目 ' + count + '</span>';
+      list.appendChild(li);
+      // 見本が縦に伸び続けないよう、古い追加分から消す
+      var added = list.querySelectorAll('.mitem.new');
+      if (added.length > 2) added[0].remove();
+    });
+    demo.querySelector('[data-save]').addEventListener('click', function () {
+      toast.classList.remove('show');
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      clearTimeout(timer);
+      timer = setTimeout(function () { toast.classList.remove('show'); }, 1600);
+    });
+    var sw = demo.querySelector('.msw');
+    sw.addEventListener('click', function () {
+      sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true'));
+    });
+  });
+})();
+</script>
