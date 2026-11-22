@@ -82,6 +82,27 @@ fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" str
 - `data-strike` を付けると、完了時に文字が薄くなり打ち消し線が引かれる。やることリストの項目だけに付ける。
 - チェックの印とスイッチのつまみは弾む。これは決定済みの「要所の動き」なので、ほかの部品に弾みを足さない。
 
+### 芽吹き(完了の演出)
+
+やることを完了にした瞬間だけ、チェックの上に芽が出て約 1 秒で消える。読み込み時から完了している項目には出さないため、CSS だけでは付けず、`change` のときに JS で `data-sprout` を付ける。ページに 1 回だけ書けば、あとから足した項目にも効く。
+
+```js
+// やることを完了にした瞬間だけ芽を出す
+document.addEventListener('change', (e) => {
+  const cb = e.target;
+  const label = cb.closest?.('.td-check');
+  if (!label || !cb.checked || !label.querySelector('[data-strike]')) return;
+  label.removeAttribute('data-sprout');
+  void label.offsetWidth; // 続けて押したときも最初から再生する
+  label.setAttribute('data-sprout', '');
+  label.addEventListener('animationend', () => label.removeAttribute('data-sprout'), { once: true });
+});
+```
+
+- 芽が出るのは `data-strike` の付いた項目(やること)だけ。設定のチェックボックスには出ない。
+- 「視差効果を減らす」設定では、伸びる動きをやめ、その場に出て消えるだけにする(CSS 側で済んでいる)。
+- 芽はチェックの上にはみ出す。一覧の最初の行でも切れないよう、親に `overflow: hidden` を付けない。
+
 ## 一覧
 
 ```html
@@ -101,6 +122,30 @@ fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" str
 - 選択中の行は `aria-selected="true"` か `aria-current="page"` にする。
 - 追加した行には `data-new` を付ける。進入時に一度だけ弾む。次の描画で属性を外す必要はない。
 - 行を消すときは確認を出さずに消し、トーストで Undo を出す。
+
+## 集計の数字
+
+```html
+<div class="td-stats">
+  <div class="td-stat">
+    <span class="td-stat-label">記録した日</span>
+    <span class="td-stat-value">4<span class="td-stat-unit">/ 7 日</span></span>
+    <span class="td-ticks" aria-hidden="true">
+      <i data-level="3"></i><i data-level="3"></i><i data-level="1"></i><i data-level="3"></i><i data-level="2" data-today></i><i></i><i></i>
+    </span>
+  </div>
+  <div class="td-stat">
+    <span class="td-stat-label">合計</span>
+    <span class="td-stat-value">3:25</span>
+  </div>
+</div>
+```
+
+- 数字は等幅(`--font-mono`)、単位は小さく薄く添える。時間は「3 時間 25 分」ではなく「3:25」にする。
+- 刻み(`.td-ticks`)は 1 つが 1 日か 1 回。濃さは `data-level` の 0〜3(省略は 0)。今日には `data-today` を付ける。
+- 濃さの基準は画面ごとに決め、近くに一言で書く(例: 「濃いほど長く記録した日」)。
+- 刻みは飾りなので `aria-hidden="true"` にする。必要な情報は数字と文で伝える。
+- 1 つのまとまりに数値は 3〜4 個まで。カードの中に置き、数値ごとに枠を付けない。
 
 ## カード
 
