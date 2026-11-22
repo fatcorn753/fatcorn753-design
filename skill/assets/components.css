@@ -82,25 +82,25 @@ select.td-input { appearance: none; padding-right: var(--space-8);
   position: relative; display: inline-flex; align-items: center; gap: var(--space-3);
   min-height: var(--control-h); cursor: pointer;
 }
-.td-check input {
+.td-check input:not(.td-switch) {
   appearance: none; margin: 0; flex: none;
   width: 20px; height: 20px; border-radius: 6px;
   border: 1.5px solid var(--border-control); background: var(--bg-surface);
   display: inline-grid; place-content: center; cursor: pointer;
   transition: background-color var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);
 }
-.td-check input::before {
+.td-check input:not(.td-switch)::before {
   content: ""; width: 10px; height: 5.5px;
   border: 2px solid var(--on-accent); border-top: 0; border-right: 0;
   transform: translateY(-1px) rotate(-45deg) scale(var(--motion-pop-from));
   opacity: 0;
   transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-spring) var(--ease-spring);
 }
-.td-check input:checked { background: var(--accent-solid); border-color: var(--accent-solid); }
-.td-check input:checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
-.td-check input:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.td-check input:not(.td-switch):checked { background: var(--accent-solid); border-color: var(--accent-solid); }
+.td-check input:not(.td-switch):checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
+.td-check input:not(.td-switch):focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 /* 完了した項目の文字は薄くし、打ち消し線を引く */
-.td-check input:checked + .td-check-text[data-strike] { color: var(--text-secondary); text-decoration: line-through; }
+.td-check input:not(.td-switch):checked + .td-check-text[data-strike] { color: var(--text-secondary); text-decoration: line-through; }
 /* 芽吹き: やることを完了にした瞬間だけ、チェックの上に芽が出て消える。
    読み込み時の完了済みには出さないため、JS が change のときに data-sprout を付ける(references/components.md) */
 .td-check[data-sprout]::after {
